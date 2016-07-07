@@ -1,3 +1,5 @@
+mod vm;
+
 use std::cell::Cell;
 use vm::opcodes::Opcode;
 
