@@ -5,3 +5,4 @@ authors = ["Splitty <splittydev@gmail.com>"]
 
 [dependencies]
 clap = "^2"
+cargo-modules = "0.2.2"
