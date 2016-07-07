@@ -3,6 +3,7 @@ use clap::{Arg, App};
 use std::fs::File;
 use std::io::Read;
 mod lexer;
+mod vm;
 use lexer::Lexer;
 
 fn main() {
