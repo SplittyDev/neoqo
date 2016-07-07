@@ -1,7 +1,5 @@
-mod vm;
-
 use std::cell::Cell;
-use lexer::vm::opcodes::Opcode;
+use vm::opcodes::Opcode;
 
 pub struct Lexer {
     stream: Vec<char>,
