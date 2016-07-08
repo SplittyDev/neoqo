@@ -1,19 +1,13 @@
 use std::cell::Cell;
 use vm::opcodes::Opcode;
+use vm::instruction::Instruction;
 
 pub struct Lexer {
     stream: Vec<char>,
-    tokens: Vec<Lexeme>,
     stream_pos: Cell<i32>,
     current_pos: Cell<i32>,
     current_line: Cell<i32>,
-}
-
-pub struct Lexeme {
-    pos: i32,
-    line: i32,
-    value: String,
-    opcode: Opcode,
+    pub tokens: Vec<Instruction>,
 }
 
 impl Lexer {
@@ -124,12 +118,7 @@ impl Lexer {
 
     fn create_lexeme(&mut self, state: (i32, i32), value: String, opcode: Opcode) {
         println!("[{}:{}] '{}'", state.1, state.0, value);
-        let lex = Lexeme {
-            pos: state.0,
-            line: state.1,
-            value: value,
-            opcode: opcode,
-        };
+        let lex = Instruction::new(state.0, state.1, value, opcode);
         self.tokens.push(lex);
     }
 }

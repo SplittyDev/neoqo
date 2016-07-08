@@ -3,8 +3,10 @@ use clap::{Arg, App};
 use std::fs::File;
 use std::io::Read;
 mod lexer;
+mod optimizer;
 mod vm;
 use lexer::Lexer;
+use vm::VirtualMachine;
 
 fn main() {
 
@@ -36,5 +38,10 @@ fn main() {
 
     // Create the Lexer
     let mut lexer = Lexer::new(source);
-    let tokens = lexer.tokenize();
+    lexer.tokenize();
+
+    // TODO: Create the optimizer
+
+    // Create the virtual machine
+    let mut vm = VirtualMachine::new(lexer.tokens);
 }
