@@ -1,5 +1,7 @@
+use std::fmt::{Display, Formatter, Result};
 use vm::opcodes::Opcode;
 
+#[derive(Clone)]
 pub struct Instruction {
     pos: i32,
     line: i32,
@@ -16,8 +18,10 @@ impl Instruction {
             opcode: opcode,
         }
     }
+}
 
-    pub fn get_line_and_position(&self) -> (i32, i32) {
-        (self.line, self.pos)
+impl Display for Instruction {
+    fn fmt(&self, f: &mut Formatter) -> Result {
+        write!(f, "({}:{})", self.line, self.pos)
     }
 }

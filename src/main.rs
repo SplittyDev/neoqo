@@ -43,5 +43,6 @@ fn main() {
     // TODO: Create the optimizer
 
     // Create the virtual machine
-    let mut vm = VirtualMachine::new(lexer.tokens);
+    let mut vm = VirtualMachine::new(lexer.tokens, Option::None, Option::None);
+    vm.run();
 }
