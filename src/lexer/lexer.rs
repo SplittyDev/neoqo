@@ -179,7 +179,7 @@ impl Lexer {
     /// The state parameter expects a tuple contaning the position relative to the current line
     /// and the current line, in that order.
     fn create_instruction(&mut self, state: (i32, i32), value: String, opcode: Opcode) {
-        let lex = Instruction::new(state.0, state.1, value, opcode);
+        let lex = Instruction::new(state.0, state.1, value, opcode, None);
         self.tokens.push(lex);
     }
 }

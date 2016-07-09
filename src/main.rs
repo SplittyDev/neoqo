@@ -4,7 +4,8 @@ use std::fs::File;
 use std::io::Read;
 mod lexer;
 use lexer::Lexer;
-// mod optimizer;
+mod optimizer;
+use optimizer::{Optimizer, OptimizerPass};
 mod vm;
 use vm::VirtualMachine;
 
@@ -37,13 +38,16 @@ fn main() {
             .expect(&format!("Unable to read the specified file: {}", filename));
     }
 
-    // Create the Lexer
+    // Tokenize the source
     let mut lexer = Lexer::new(source);
     lexer.tokenize();
 
-    // TODO: Create the optimizer
+    // Run basic optimization passes
+    let mut optimizer = Optimizer::new(lexer.tokens.clone(), None);
+    optimizer.add_pass(OptimizerPass::OptimizeClearLoops);
+    optimizer.optimize();
 
-    // Create the virtual machine
-    let mut vm = VirtualMachine::new(lexer.tokens, Option::None, Option::None);
+    // Interpret the instructions
+    let mut vm = VirtualMachine::new(optimizer.in_instructions, Option::None, Option::None);
     vm.run();
 }

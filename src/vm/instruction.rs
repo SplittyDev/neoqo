@@ -5,22 +5,30 @@ use vm::opcodes::Opcode;
 #[derive(Clone)]
 pub struct Instruction {
     /// The position relative to the line.
-    pos: i32,
+    pub pos: i32,
 
     /// The line.
-    line: i32,
+    pub line: i32,
 
     /// The value of the instruction.
     pub value: String,
 
     /// The opcode.
     pub opcode: Opcode,
+
+    /// The (optional) argument.
+    pub argument: Option<u32>,
 }
 
 /// The `Instruction` implementation.
 impl Instruction {
     /// Constructs a new `Instruction.`
-    pub fn new(pos: i32, line: i32, value: String, opcode: Opcode) -> Instruction {
+    pub fn new(pos: i32,
+               line: i32,
+               value: String,
+               opcode: Opcode,
+               arg: Option<u32>)
+               -> Instruction {
 
         // Create the instruction
         Instruction {
@@ -28,7 +36,12 @@ impl Instruction {
             line: line,
             value: value,
             opcode: opcode,
+            argument: arg,
         }
+    }
+
+    pub fn is(&self, opcode: Opcode) -> bool {
+        self.opcode == opcode
     }
 }
 

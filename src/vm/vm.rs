@@ -138,6 +138,9 @@ impl VirtualMachine {
             // Decrement the cell pointer
             Opcode::DecPtr => self.cp = max(0, self.cp - 1),
 
+            // Clear the cell value
+            Opcode::Clear => self.memory[self.cp] = 0,
+
             // Increment the cell value
             Opcode::Inc => self.memory[self.cp] += 1,
 
