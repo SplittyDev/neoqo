@@ -60,7 +60,7 @@ impl VirtualMachine {
             instructions: instructions,
             jump_table: BTreeMap::new(),
             print_mode: PrintMode::Char,
-            stack: vec![0; stack_size.unwrap_or(DEFAULT_STACK_SIZE)],
+            stack: Vec::with_capacity(stack_size.unwrap_or(DEFAULT_STACK_SIZE)),
             memory: vec![0; memory_size.unwrap_or(DEFAULT_MEMORY_SIZE)],
         }
     }
