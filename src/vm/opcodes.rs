@@ -16,10 +16,8 @@ pub enum Opcode {
     JnzStack, // )
     JmpStack, // ^
     Dup, // &
-    Switch, // \
+    Swap, // \
     Count, // #
-    Comment, // '
-    Reverse, // @
     Compare, // =
     Str, // "
     Break, // !

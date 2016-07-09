@@ -22,7 +22,7 @@ impl Lexer {
     }
 
     pub fn tokenize(&mut self) {
-        let operators = String::from("<>[]()+-*/\\.,:;&^#=@bciqx!");
+        let operators = String::from("<>[]()+-*/\\.,:;&^#=bciqx!");
         let opcodes = [Opcode::DecPtr,
                        Opcode::IncPtr,
                        Opcode::JzCell,
@@ -33,7 +33,7 @@ impl Lexer {
                        Opcode::Dec,
                        Opcode::Double,
                        Opcode::Halve,
-                       Opcode::Switch,
+                       Opcode::Swap,
                        Opcode::Print,
                        Opcode::Read,
                        Opcode::Push,
@@ -42,7 +42,6 @@ impl Lexer {
                        Opcode::JmpStack,
                        Opcode::Count,
                        Opcode::Compare,
-                       Opcode::Reverse,
                        Opcode::BinMod,
                        Opcode::ChrMod,
                        Opcode::IntMod,
