@@ -54,10 +54,27 @@ fn main() {
     lexer.tokenize();
 
     // Run basic optimization passes
+    //
+    // A quick overview of why I choose this specific order
+    // of optimization passes:
+    //
+    // 1) OptimizeIncDecPtrChains
+    //    This pass cleans up pointer movement operations.
+    //    By having this execute before the OptimizeIncDecValChains pass,
+    //    the chance of eliminating effectively useless loops is higher,
+    //    which makes the OptimizeIncDecValChains pass work better.
+    // 2) OptimizeIncDecValChains
+    //    This pass collapses multiple inc/dec cell value instructions
+    //    into just one, which frees the way for the OptimizeClearLoops pass.
+    // 3) OptimizeClearLoops
+    //    This pass turns clear loops into a single clear instruction.
+    //    It depends on a specific sequence of operations, which is why
+    //    the OptimizeIncDecValChains pass should always run before this one.
     let mut optimizer = Optimizer::new(lexer.tokens.clone(), None);
+    optimizer.add_pass(OptimizerPass::OptimizeIncDecPtrChains);
+    optimizer.add_pass(OptimizerPass::OptimizeIncDecValChains);
     optimizer.add_pass(OptimizerPass::OptimizeClearLoops);
-    optimizer.add_pass(OptimizerPass::OptimizeIncDecChains);
-    optimizer.optimize();
+    optimizer.optimize(1);
 
     // Interpret the instructions
     let mut vm = VirtualMachine::new(optimizer.instructions, Option::None, Option::None);

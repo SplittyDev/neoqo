@@ -136,7 +136,9 @@ impl VirtualMachine {
             Opcode::IncPtr => self.cp += instr.argument.unwrap_or(1) as usize,
 
             // Decrement the cell pointer
-            Opcode::DecPtr => self.cp = max(0, self.cp - instr.argument.unwrap_or(1) as usize),
+            Opcode::DecPtr => {
+                self.cp = max(0, self.cp - max(0, instr.argument.unwrap_or(1)) as usize)
+            }
 
             // Clear the cell value
             Opcode::Clear => self.memory[self.cp] = 0,

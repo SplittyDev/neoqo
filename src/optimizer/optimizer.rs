@@ -12,9 +12,15 @@ pub enum OptimizerPass {
 
     /// Increment/decrement chain optimization pass.
     ///
-    /// Creates a single `Opcode::IncCell` or `Opcode::DecCell` from a
-    /// chain of cell increment or decrement operators.
-    OptimizeIncDecChains,
+    /// Creates a single `Opcode::Inc` or `Opcode::Dec` from a
+    /// chain of cell increment and decrement operators.
+    OptimizeIncDecValChains,
+
+    /// Increment/decrement pointer chain optimization pass.
+    ///
+    /// Create a single `Opcode::IncPtr` or `Opcode::DecPtr` from a
+    /// chain of cell pointer increment and decrement operators.
+    OptimizeIncDecPtrChains,
 }
 
 /// The `Optimizer` type.
@@ -57,21 +63,32 @@ impl Optimizer {
     }
 
     /// Runs the specified optimizations.
-    pub fn optimize(&mut self) {
-        let mut state = self.create_pass_state();
-        while state.can_advance(1) {
+    pub fn optimize(&mut self, iterations: usize) {
+        if self.passes.len() == 0 || iterations == 0 {
+            return;
+        }
+        for _ in 0..iterations {
             for pass in self.passes.clone() {
-                let changed = match pass {
-                    OptimizerPass::OptimizeClearLoops => self.optimize_clear_loops(&mut state),
-                    OptimizerPass::OptimizeIncDecChains => self.optimize_inc_dec_chains(&mut state),
-                };
-                if !changed {
-                    self.out_instructions.push(self.instructions[state.pos].clone());
-                    state.skip(1);
+                let mut state = self.create_pass_state();
+                while state.can_advance(0) {
+                    let changed = match pass {
+                        OptimizerPass::OptimizeClearLoops => self.optimize_clear_loops(&mut state),
+                        OptimizerPass::OptimizeIncDecValChains => {
+                            self.optimize_inc_dec_val_chains(&mut state)
+                        }
+                        OptimizerPass::OptimizeIncDecPtrChains => {
+                            self.optimize_inc_dec_ptr_chains(&mut state)
+                        }
+                    };
+                    if !changed {
+                        self.out_instructions.push(self.instructions[state.pos].clone());
+                        state.skip(1);
+                    }
                 }
+                self.instructions = self.out_instructions.clone();
+                self.out_instructions.clear();
             }
         }
-        self.instructions = self.out_instructions.clone();
     }
 
     fn optimize_clear_loops(&mut self, state: &mut OptimizerPassState) -> bool {
@@ -96,17 +113,17 @@ impl Optimizer {
         }
     }
 
-    fn optimize_inc_dec_chains(&mut self, state: &mut OptimizerPassState) -> bool {
+    fn optimize_inc_dec_val_chains(&mut self, state: &mut OptimizerPassState) -> bool {
         let mut incs = 0;
         let mut decs = 0;
         let fst = state.peek_at(self, 0).unwrap();
-        while state.can_advance(1) {
+        while state.can_advance(0) {
             let current = state.peek_at(self, 0);
             match current {
                 Some(val) => {
                     match val.opcode {
-                        Opcode::Inc => incs += 1,
-                        Opcode::Dec => decs += 1,
+                        Opcode::Inc => incs += val.argument.unwrap_or(1),
+                        Opcode::Dec => decs += val.argument.unwrap_or(1),
                         _ => break,
                     }
                     state.skip(1);
@@ -120,6 +137,42 @@ impl Optimizer {
                 opcode: match (incs as i64 - decs as i64) > 0 {
                     true => Opcode::Inc,
                     false => Opcode::Dec,
+                },
+                argument: Some(match (incs as i64 - decs as i64) > 0 {
+                    true => incs - decs,
+                    false => decs - incs,
+                }),
+                ..fst
+            });
+            return true;
+        }
+        false
+    }
+
+    fn optimize_inc_dec_ptr_chains(&mut self, state: &mut OptimizerPassState) -> bool {
+        let mut incs = 0;
+        let mut decs = 0;
+        let fst = state.peek_at(self, 0).unwrap();
+        while state.can_advance(0) {
+            let current = state.peek_at(self, 0);
+            match current {
+                Some(val) => {
+                    match val.opcode {
+                        Opcode::IncPtr => incs += val.argument.unwrap_or(1),
+                        Opcode::DecPtr => decs += val.argument.unwrap_or(1),
+                        _ => break,
+                    }
+                    state.skip(1);
+                }
+                None => break,
+            }
+        }
+        if incs != 0 || decs != 0 {
+            self.out_instructions.push(Instruction {
+                value: OPTIMIZED_VALUE.to_string(),
+                opcode: match (incs as i64 - decs as i64) > 0 {
+                    true => Opcode::IncPtr,
+                    false => Opcode::DecPtr,
                 },
                 argument: Some(match (incs as i64 - decs as i64) > 0 {
                     true => incs - decs,
