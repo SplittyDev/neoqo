@@ -2,4 +2,6 @@
 (               ' -- loop while the top of the stack is not zero
   ;             '    pop the next character
   .             '    print the character
-)               ' -- loop end
+);              ' -- /loop
+[-]             ' clear the cell
+++**-.          ' play a tone (ASCII BELL character)
