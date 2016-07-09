@@ -11,7 +11,7 @@ Qo was designed to make simple tasks hard to solve, but also fun.
 Writing a qo program that actual does what it's supposed to is deeply satisfying (:
 
 ## Hello, world!
-```
+```vbnet
 "Hello, world!" ' push string in reverse order
 (               ' -- loop while the top of the stack is not zero
   ;             '    pop the next character
