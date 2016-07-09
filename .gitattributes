@@ -2,7 +2,7 @@
 * text=auto
 
 # Qo
-*.qo linguist-language=vbnet
+*.qo linguist-language=neoqo
 
 # Custom for Visual Studio
 *.cs     diff=csharp
