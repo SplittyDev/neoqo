@@ -3,11 +3,12 @@ use clap::{Arg, App};
 use std::fs::File;
 use std::io::Read;
 mod lexer;
-mod optimizer;
-mod vm;
 use lexer::Lexer;
+// mod optimizer;
+mod vm;
 use vm::VirtualMachine;
 
+/// The main entry point of the application.
 fn main() {
 
     // Process command-line arguments

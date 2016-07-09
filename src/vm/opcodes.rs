@@ -1,3 +1,4 @@
+/// The `Opcode` type.
 #[derive(Debug, Copy, Clone)]
 pub enum Opcode {
     Inc, // +
