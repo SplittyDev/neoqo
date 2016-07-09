@@ -175,6 +175,7 @@ impl VirtualMachine {
             // The string is pushed in reverse order, that way it can be easily processed.
             Opcode::Str => {
                 let vec: Vec<char> = instr.value.chars().collect();
+                self.stack.push(0);
                 for i in 0..vec.len() {
                     self.stack.push(vec[vec.len() - i - 1] as u32);
                 }
