@@ -1,0 +1,49 @@
+' Let's start with a simple one:
+' "Hello, world!"(;.);
+'
+' Explanation:
+"Hello, world!"   ' push string in reverse order
+(                 ' -- loop while the top of the stack is not zero
+  ;               '    pop the next character
+  .               '    print the character
+);                ' -- /loop and pop the string terminator
+
+' Print a newline character:
+' ++**++.:
+'
+' Explanation:
+++**++            ' 0 <- +1, +1, *2, *2, +1, +1 = 10
+.                 ' print the character (10 = ASCII Newline)
+:                 ' push the character
+
+' This is the same one, using a cell-conditional loop:
+' "Hello, world!"+[;.]
+'
+' Explanation:
+"Hello, world!"   ' push string in reverse order
++[                ' -- increment cell by one and start looping
+  ;               '    pop the next character
+  [.[-];];        '    print the character
+];                ' -- /loop and pop the string terminator
+
+' Let's start a new line again:
+' ;.
+'
+' Explanation:
+' We previously pushed the ASCII value 10 onto the stack.
+' Now we just have to pop it again and print it!
+;                 ' pop the newline character
+.                 ' print the character
+
+' Doing it the brainf*ck way:
+' [-]++++++++[>++++[>++>+++>+++>+<<<<-]
+' >+>+>->>+[<]<-]>>.>---.+++++++..+++.>
+' >.<-.<.+++.------.--------.>>+.>++.
+'
+' Explanation:
+' Obviously I'm not going to comment this line-by-line.
+' All this does is calculating the ASCII values of the string
+' by hand and printing the characters one by one.
+[-]++++++++[>++++[>++>+++>+++>+<<<<-]
+>+>+>->>+[<]<-]>>.>---.+++++++..+++.>
+>.<-.<.+++.------.--------.>>+.>++.
