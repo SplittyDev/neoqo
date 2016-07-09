@@ -2,7 +2,7 @@
 * text=auto
 
 # Qo
-*.qo linguist-language=neoqo
+*.qo linguist-language=qo
 
 # Custom for Visual Studio
 *.cs     diff=csharp
