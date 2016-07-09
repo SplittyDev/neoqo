@@ -74,7 +74,7 @@ fn main() {
     optimizer.add_pass(OptimizerPass::OptimizeIncDecPtrChains);
     optimizer.add_pass(OptimizerPass::OptimizeIncDecValChains);
     optimizer.add_pass(OptimizerPass::OptimizeClearLoops);
-    optimizer.optimize(1);
+    optimizer.optimize(2);
 
     // Interpret the instructions
     let mut vm = VirtualMachine::new(optimizer.instructions, Option::None, Option::None);
