@@ -18,24 +18,35 @@ fn main() {
         .author("Splitty <splittdev@gmail.com>")
         .arg(Arg::with_name("input")
             .help("The input file.")
-            .required(true)
+            .required(false)
             .index(1))
+        .arg(Arg::with_name("i")
+            .short("i")
+            .long("interpret")
+            .takes_value(true))
         .get_matches();
 
-    // Get the filename
-    let filename: &str = matches.value_of("input")
-        .expect("Please specify an input file!");
-
-    // Get the source out of the file
+    // Retrieve the input code from the specified source
     let mut source = String::new();
-    {
-        // Open the file
-        let mut f = File::open(filename)
-            .expect(&format!("Unable to open specified file: {}", filename));
+    match matches.value_of("input") {
 
-        // Read the file
-        f.read_to_string(&mut source)
-            .expect(&format!("Unable to read the specified file: {}", filename));
+        // A filename was specified
+        Some(filename) => {
+            // Open the file
+            let mut f = File::open(filename)
+                .expect(&format!("Unable to open specified file: {}", filename));
+
+            // Read the file
+            f.read_to_string(&mut source)
+                .expect(&format!("Unable to read the specified file: {}", filename));
+        }
+
+        // No filename was specified
+        None => {
+            source.push_str(matches.value_of("i")
+                .unwrap_or("\"Please specifiy an input file!\"(;.);"));
+            println!("Source: {}", source);
+        }
     }
 
     // Tokenize the source
@@ -45,9 +56,10 @@ fn main() {
     // Run basic optimization passes
     let mut optimizer = Optimizer::new(lexer.tokens.clone(), None);
     optimizer.add_pass(OptimizerPass::OptimizeClearLoops);
+    optimizer.add_pass(OptimizerPass::OptimizeIncDecChains);
     optimizer.optimize();
 
     // Interpret the instructions
-    let mut vm = VirtualMachine::new(optimizer.in_instructions, Option::None, Option::None);
+    let mut vm = VirtualMachine::new(optimizer.instructions, Option::None, Option::None);
     vm.run();
 }

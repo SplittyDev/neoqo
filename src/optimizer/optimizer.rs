@@ -9,6 +9,12 @@ pub enum OptimizerPass {
     ///
     /// Creates a single `Opcode::Clear` from `[-]`-style loops.
     OptimizeClearLoops,
+
+    /// Increment/decrement chain optimization pass.
+    ///
+    /// Creates a single `Opcode::IncCell` or `Opcode::DecCell` from a
+    /// chain of cell increment or decrement operators.
+    OptimizeIncDecChains,
 }
 
 /// The `Optimizer` type.
@@ -17,7 +23,7 @@ pub struct Optimizer {
     passes: Vec<OptimizerPass>,
 
     /// The input instruction vector.
-    pub in_instructions: Vec<Instruction>,
+    pub instructions: Vec<Instruction>,
 
     /// The optimized instruction vector.
     out_instructions: Vec<Instruction>,
@@ -25,10 +31,10 @@ pub struct Optimizer {
 
 /// The `OptimizerPassState` type.
 struct OptimizerPassState {
-    /// The position in the `Optimizer.in_instructions` vector.
+    /// The position in the `Optimizer.instructions` vector.
     pos: usize,
 
-    /// The length of the `Optimizer.in_instructions` vector.
+    /// The length of the `Optimizer.instructions` vector.
     size: usize,
 }
 
@@ -40,7 +46,7 @@ impl Optimizer {
         // Create the optimizer
         Optimizer {
             passes: passes.unwrap_or(Vec::new()),
-            in_instructions: instructions.clone(),
+            instructions: instructions.clone(),
             out_instructions: Vec::with_capacity(instructions.len()),
         }
     }
@@ -52,46 +58,84 @@ impl Optimizer {
 
     /// Runs the specified optimizations.
     pub fn optimize(&mut self) {
-        let passes = self.passes.clone();
-        for pass in passes {
-            match pass {
-                OptimizerPass::OptimizeClearLoops => self.optimize_clear_loops(),
+        let mut state = self.create_pass_state();
+        while state.can_advance(1) {
+            for pass in self.passes.clone() {
+                let changed = match pass {
+                    OptimizerPass::OptimizeClearLoops => self.optimize_clear_loops(&mut state),
+                    OptimizerPass::OptimizeIncDecChains => self.optimize_inc_dec_chains(&mut state),
+                };
+                if !changed {
+                    self.out_instructions.push(self.instructions[state.pos].clone());
+                    state.skip(1);
+                }
             }
-            self.in_instructions = self.out_instructions.clone();
-            self.out_instructions = Vec::with_capacity(self.in_instructions.len());
+        }
+        self.instructions = self.out_instructions.clone();
+    }
+
+    fn optimize_clear_loops(&mut self, state: &mut OptimizerPassState) -> bool {
+        let three = state.peek(self, 3);
+        match three {
+            Some(instr) => {
+                if (instr[0].is(Opcode::JzStack) || instr[0].is(Opcode::JzCell)) &&
+                   instr[1].is(Opcode::Dec) &&
+                   (instr[2].is(Opcode::JnzStack) || instr[2].is(Opcode::JnzCell)) {
+                    self.out_instructions
+                        .push(Instruction {
+                            value: OPTIMIZED_VALUE.to_string(),
+                            opcode: Opcode::Clear,
+                            ..instr[0].clone()
+                        });
+                    state.skip(3);
+                    return true;
+                }
+                false
+            }
+            _ => false,
         }
     }
 
-    fn optimize_clear_loops(&mut self) {
-        let mut state = self.create_pass_state();
+    fn optimize_inc_dec_chains(&mut self, state: &mut OptimizerPassState) -> bool {
+        let mut incs = 0;
+        let mut decs = 0;
+        let fst = state.peek_at(self, 0).unwrap();
         while state.can_advance(1) {
-            let three = state.peek(self, 3);
-            match three {
-                Some(instr) => {
-                    if (instr[0].is(Opcode::JzStack) || instr[0].is(Opcode::JzCell)) &&
-                       instr[1].is(Opcode::Dec) &&
-                       (instr[2].is(Opcode::JnzStack) || instr[2].is(Opcode::JnzCell)) {
-                        self.out_instructions
-                            .push(Instruction {
-                                value: OPTIMIZED_VALUE.to_string(),
-                                opcode: Opcode::Clear,
-                                ..instr[0].clone()
-                            });
-                        state.skip(3);
-                        continue;
+            let current = state.peek_at(self, 0);
+            match current {
+                Some(val) => {
+                    match val.opcode {
+                        Opcode::Inc => incs += 1,
+                        Opcode::Dec => decs += 1,
+                        _ => break,
                     }
+                    state.skip(1);
                 }
-                _ => (),
+                None => break,
             }
-            self.out_instructions.push(self.in_instructions[state.pos].clone());
-            state.skip(1);
         }
+        if incs != 0 || decs != 0 {
+            self.out_instructions.push(Instruction {
+                value: OPTIMIZED_VALUE.to_string(),
+                opcode: match (incs as i64 - decs as i64) > 0 {
+                    true => Opcode::Inc,
+                    false => Opcode::Dec,
+                },
+                argument: Some(match (incs as i64 - decs as i64) > 0 {
+                    true => incs - decs,
+                    false => decs - incs,
+                }),
+                ..fst
+            });
+            return true;
+        }
+        false
     }
 
     fn create_pass_state(&self) -> OptimizerPassState {
         OptimizerPassState {
             pos: 0,
-            size: self.in_instructions.len(),
+            size: self.instructions.len(),
         }
     }
 }
@@ -103,12 +147,20 @@ impl OptimizerPassState {
         self.pos + n < self.size
     }
 
+    /// Peeks at the 'n'-th instruction relative to `self.pos`.
+    fn peek_at(&self, optimizer: &mut Optimizer, n: usize) -> Option<Instruction> {
+        match self.can_advance(n) {
+            true => Some(optimizer.instructions[self.pos + n].clone()),
+            false => None,
+        }
+    }
+
     /// Peeks at the next `n` instructions.
     fn peek(&self, optimizer: &mut Optimizer, n: usize) -> Option<Vec<Instruction>> {
         match self.can_advance(n) {
             true => {
                 let mut vec: Vec<Instruction> = Vec::with_capacity(n);
-                vec.extend_from_slice(&optimizer.in_instructions[self.pos..(self.pos + n)]);
+                vec.extend_from_slice(&optimizer.instructions[self.pos..(self.pos + n)]);
                 Some(vec)
             }
             false => None,

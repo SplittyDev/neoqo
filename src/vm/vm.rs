@@ -133,19 +133,21 @@ impl VirtualMachine {
         match instr.opcode {
 
             // Increment the cell pointer
-            Opcode::IncPtr => self.cp += 1,
+            Opcode::IncPtr => self.cp += instr.argument.unwrap_or(1) as usize,
 
             // Decrement the cell pointer
-            Opcode::DecPtr => self.cp = max(0, self.cp - 1),
+            Opcode::DecPtr => self.cp = max(0, self.cp - instr.argument.unwrap_or(1) as usize),
 
             // Clear the cell value
             Opcode::Clear => self.memory[self.cp] = 0,
 
             // Increment the cell value
-            Opcode::Inc => self.memory[self.cp] += 1,
+            Opcode::Inc => self.memory[self.cp] += instr.argument.unwrap_or(1),
 
             // Decrement the cell value
-            Opcode::Dec => self.memory[self.cp] = max(0, self.memory[self.cp] - 1),
+            Opcode::Dec => {
+                self.memory[self.cp] = max(0, self.memory[self.cp] - instr.argument.unwrap_or(1))
+            }
 
             // Double the cell value
             Opcode::Double => self.memory[self.cp] *= 2,
