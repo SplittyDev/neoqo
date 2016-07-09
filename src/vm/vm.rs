@@ -142,7 +142,7 @@ impl VirtualMachine {
             Opcode::Inc => self.memory[self.cp] += 1,
 
             // Decrement the cell value
-            Opcode::Dec => self.memory[self.cp] = max(0, self.memory[self.cp - 1]),
+            Opcode::Dec => self.memory[self.cp] = max(0, self.memory[self.cp] - 1),
 
             // Double the cell value
             Opcode::Double => self.memory[self.cp] *= 2,
