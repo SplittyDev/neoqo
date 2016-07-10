@@ -1,7 +1,1 @@
-"Hello, world!" ' push string in reverse order
-(               ' -- loop while the top of the stack is not zero
-  ;             '    pop the next character
-  .             '    print the character
-);              ' -- /loop
-[-]             ' clear the cell
-++**-.          ' play a tone (ASCII BELL character)
+"Made with ❤ by @splittydev"(;.);
