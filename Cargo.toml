@@ -3,5 +3,14 @@ name = "neoqo"
 version = "0.1.0"
 authors = ["Splitty <splittydev@gmail.com>"]
 
+[lib]
+name = "neoqo"
+path = "src/lib.rs"
+
+[[bin]]
+name = "neoqo"
+path = "src/main.rs"
+doc = false
+
 [dependencies]
 clap = "^2"

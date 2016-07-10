@@ -1,13 +1,9 @@
 extern crate clap;
-use clap::{Arg, App};
+extern crate neoqo;
 use std::fs::File;
 use std::io::Read;
-mod lexer;
-use lexer::Lexer;
-mod optimizer;
-use optimizer::{Optimizer, OptimizerPass};
-mod vm;
-use vm::VirtualMachine;
+use clap::{Arg, App};
+use neoqo::{Lexer, Optimizer, OptimizerPass, VirtualMachine};
 
 /// The main entry point of the application.
 fn main() {
