@@ -1,6 +1,8 @@
 # neoqo
 A rusty approach to the qo programming language
 
+[Documentation](https://splittydev.github.io/neoqo/neoqo/)
+
 ## About neoqo   
 Neoqo is a rewrite of the esoteric programming language qo,   
 which I came up with in 2015 while experimenting with lexical analyzers in C#.
