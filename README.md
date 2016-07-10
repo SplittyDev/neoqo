@@ -1,7 +1,8 @@
 # neoqo
 A rusty approach to the qo programming language
 
-[![Travis](https://img.shields.io/travis/SplittyDev/neoqo.svg?maxAge=2592000?style=flat-square)]()
+[![Travis](https://img.shields.io/travis/SplittyDev/neoqo.svg?style=flat-square)]()
+[![license](https://img.shields.io/github/license/SplittyDev/neoqo.svg?style=flat-square)]()
 
 [Documentation](https://splittydev.github.io/neoqo/neoqo/)
 
