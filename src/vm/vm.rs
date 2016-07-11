@@ -1,6 +1,7 @@
 use std::collections::BTreeMap;
 use std::cmp::max;
 use std::char;
+use std::io::{self, Read};
 use vm::instruction::Instruction;
 use vm::opcodes::Opcode;
 
@@ -178,13 +179,42 @@ impl VirtualMachine {
                 }
             }
 
+            // Read a character from the standard input stream
+            // and assign its value to the current cell
+            Opcode::Read => {
+                let mut buf: [u8; 1] = [0u8; 1];
+                io::stdin().read(&mut buf).ok().unwrap();
+                self.memory[self.cp] = buf[0] as u32;
+            }
+
             // Push a string onto the stack, followed by a zero value
             // The string is pushed in reverse order, that way it can be easily processed.
             Opcode::Str => {
-                let vec: Vec<char> = instr.value.chars().collect();
                 self.stack.push(0);
-                for i in 0..vec.len() {
-                    self.stack.push(vec[vec.len() - i - 1] as u32);
+                let mut vec: Vec<char> = instr.value.chars().collect();
+                let mut i = vec.len() - 1;
+                loop {
+                    if i > 0 && vec[i - 1] == '\\' {
+                        let chr = match vec[i] {
+                            '0' => '\0',
+                            'n' => '\n',
+                            'r' => '\r',
+                            't' => '\t',
+                            '\\' => '\\',
+                            _ => panic!(format!("Invalid escape sequence: \\{}", vec[i])),
+                        };
+                        if chr != '_' {
+                            i -= 1;
+                            vec.remove(i);
+                            vec.remove(i);
+                            vec.insert(i, chr);
+                        }
+                    }
+                    self.stack.push(vec[i] as u32);
+                    if i == 0 {
+                        break;
+                    }
+                    i -= 1;
                 }
             }
 
