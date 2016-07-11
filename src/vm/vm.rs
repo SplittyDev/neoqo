@@ -1,7 +1,7 @@
 use std::collections::BTreeMap;
 use std::cmp::max;
 use std::char;
-use std::io::{self, Read};
+use std::io::{self, Read, Write};
 use vm::instruction::Instruction;
 use vm::opcodes::Opcode;
 
@@ -179,12 +179,37 @@ impl VirtualMachine {
                 }
             }
 
-            // Read a character from the standard input stream
-            // and assign its value to the current cell
+            // Read n character from the standard input stream
+            // The first character is assigned to the current cell
+            // The other characters are pushed onto the stack in reverse order
             Opcode::Read => {
-                let mut buf: [u8; 1] = [0u8; 1];
-                io::stdin().read(&mut buf).ok().unwrap();
-                self.memory[self.cp] = buf[0] as u32;
+                // Flush stdout before reading
+                // This is needed for a potential prompt to be printed before reading
+                io::stdout().flush().ok().unwrap();
+
+                // Read n or 512 characters
+                let n = match self.stack.pop() {
+                    Some(0) | None => 512,
+                    Some(n) => n,
+                };
+                let mut buf = vec![0u8; n as usize];
+                io::stdin().read(buf.as_mut_slice()).ok().unwrap();
+
+                // Assign the character to the cell,
+                // if only one character was read
+                if n == 1 {
+                    self.memory[self.cp] = buf[0] as u32;
+                }
+                // Else, push all characters onto the stack
+                // just like a normal qo string
+                else {
+                    self.stack.push(0);
+                    let mut i = buf.len();
+                    while i > 0 {
+                        self.stack.push(buf[i - 1] as u32);
+                        i -= 1;
+                    }
+                }
             }
 
             // Push a string onto the stack, followed by a zero value
