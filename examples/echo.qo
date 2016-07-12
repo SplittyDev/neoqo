@@ -1,0 +1,18 @@
+"In> "            ' push the string "In> " onto the stack
+(                 ' -- loop while the top of the stack is not zero
+  ;               '    pop the next character
+  .               '    print the character
+);                ' -- stop looping and pop the string terminator
+,                 ' read until the user presses the [ENTER] key
+"Out> "           ' push the string "Out> " onto the stack
+#                 ' set the cell to the number of elements on the stack
+[                 ' -- loop while the value of the cell is not zero
+  ;               '    pop the next character
+  [               '    -- loop while the character is not zero
+    .             '       print the character
+    [             '       -- loop while the cell is not zero
+      -           '          decrement the cell
+    ]             '       -- stop looping
+  ]               '    -- stop looping
+  #               '    set the cell to the number of elements on the stack
+]                 ' stop looping
