@@ -39,7 +39,7 @@ is encountered. Since strings always push a zero-value first,
 this is very convenient for printing a whole string.   
 
 Next, we have the `,` (read) instruction.   
-The read instruction can either read a single character assign the value of   
+The read instruction can either read a single character and assign the value of   
 it to the current cell, or read a string with a specific max amount of   
 characters and push them onto the stack, just like the `"string"` instruction.   
 In this case, we are operating in `string-mode`, because the stack is either   
@@ -53,14 +53,18 @@ count `#` operator.
 
 The pattern `#[;[.[-]]#]` is very useful for printing multiple strings.   
 We already talked about the `#` instruction, so let's skip that and jump   
-right into the first loop (`;[.[-]]#`). First, a character is popped from   
-the stack. Then we enter another loop (`.[-]`). What that loop does should   
-be pretty obvious: It prints (`.`) the current character and sets the cell to   
-zero (`[-]`). The pattern `[.[-]]` is commonly used to print a character only   
-if its value is not zero. We need that here, because the strings are separated   
-by zero (qo string terminator) values, and of course we don't want them printed!   
-After that, there's just one thing that remains: Another count (`#`)   
-instruction which sets the cell to the (now updated) amount of items on the stack.   
+right into the first loop (`;[.[-]]#`).   
+
+First, a character is popped from the stack, then we enter another loop (`.[-]`).   
+What that loop does should be pretty obvious:   
+It prints (`.`) the current character and sets the cell to zero (`[-]`).   
+
+The pattern `[.[-]]` is commonly used to print a character only if its value   
+is not zero. We need that here, because the strings are separated by zero (qo   
+string terminator) values, and of course we don't want them printed!   
+
+After that, there's just one thing that remains: Another count (`#`) instruction   
+which sets the cell to the (now updated) amount of items on the stack.   
 
 So, to wrap it all up:   
 The `#[;[.[-]]#]` pattern prints all strings on the stack and ignores zero values.   
