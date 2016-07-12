@@ -33,7 +33,7 @@ That's probably a little too much for a beginner,
 so let's break it up into small pieces!   
 
 First, we see `"In> "(;.);`   
-The `(;.);` is a common pattern in qo.
+The `(;.);` is a common pattern in qo.   
 It takes values from the stack and prints them until a zero-value   
 is encountered. Since strings always push a zero-value first,   
 this is very convenient for printing a whole string.   
