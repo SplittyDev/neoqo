@@ -2,7 +2,7 @@
 A rusty approach to the qo programming language
 
 [![Travis](https://img.shields.io/travis/SplittyDev/neoqo.svg?style=flat-square)]()
-[![license](https://img.shields.io/github/license/SplittyDev/neoqo.svg?style=flat-square)]()
+[![License](https://img.shields.io/github/license/SplittyDev/neoqo.svg?style=flat-square)]()
 
 [Documentation](https://splittydev.github.io/neoqo/neoqo/)
 
@@ -38,7 +38,7 @@ Writing a qo program that actual does what it's supposed to is deeply satisfying
 | :       | Pushes the cell onto the stack                              |
 | ;       | Pops the top value off the stack, assigning it to the cell  |
 | .       | Prints the cell                                             |
-| ,       | Reads a character from `stdin`, assigning it to the cell    |
+| ,       | Reads one or more character/s from `stdin`.                 |
 | &       | Duplicates the top stac value on the stack                  |
 | \       | Swaps two items on the stack with each other                |
 | #       | Counts the items on the stack, assigning the result to the cell |
@@ -48,4 +48,4 @@ Writing a qo program that actual does what it's supposed to is deeply satisfying
 | [ and ] | Loop while the cell is not zero                             |
 | ( and ) | Loop while the top value on the stack is not zero           |
 
-There are a few more instructions, which are not yet implemented.
+You can find in-depth documentation in the [wiki](https://github.com/SplittyDev/neoqo/wiki).
