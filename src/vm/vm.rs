@@ -111,6 +111,17 @@ impl VirtualMachine {
 
         // Run normally
         self.run();
+
+        // Terminate the debugging session
+        match self.debug_server.as_mut() {
+            Some(server) => {
+                server.update(DebugInformation {
+                    instr: None,
+                    terminate: true,
+                });
+            }
+            None => (),
+        }
     }
 
     /// Builds the jump table.
@@ -168,7 +179,10 @@ impl VirtualMachine {
         // Test if a debugger is attached
         if self.debugger_attached && self.debug_server.is_some() {
             let mut server = self.debug_server.as_mut().unwrap();
-            if !server.update(DebugInformation { instr: instr.clone() }) {
+            if !server.update(DebugInformation {
+                instr: Some(instr.clone()),
+                terminate: false,
+            }) {
                 println!("***\nWARN: Debugger disconnected!\n***");
                 self.debugger_attached = false;
             }

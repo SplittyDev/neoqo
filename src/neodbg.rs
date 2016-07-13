@@ -16,16 +16,27 @@ fn main() {
     loop {
         match client.get_update() {
             None => continue,
-            Some(data) => handle(data),
+            Some(data) => {
+                if data.terminate {
+                    println!("Debugger session terminated by server.");
+                    return;
+                }
+                handle(data);
+            }
         }
     }
 }
 
 fn handle(data: DebugInformation) {
-    println!("[Line {:03}:{:03}] Opcode={:?}; Arg={:?}; Optimized={}",
-             data.instr.line,
-             data.instr.pos,
-             data.instr.opcode,
-             data.instr.argument,
-             data.instr.optimized);
+    match data.instr {
+        Some(instr) => {
+            println!("[Line {:03}:{:03}] Opcode={:?}; Arg={:?}; Optimized={}",
+                     instr.line,
+                     instr.pos,
+                     instr.opcode,
+                     instr.argument,
+                     instr.optimized);
+        }
+        None => (),
+    }
 }

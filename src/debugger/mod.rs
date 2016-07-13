@@ -17,5 +17,8 @@ pub const DEBUGGER_PORT: u16 = 38100;
 #[derive(RustcEncodable, RustcDecodable, PartialEq, Debug)]
 pub struct DebugInformation {
     /// The current instruction.
-    pub instr: Instruction,
+    pub instr: Option<Instruction>,
+
+    /// Whether the debugger should terminate.
+    pub terminate: bool,
 }
