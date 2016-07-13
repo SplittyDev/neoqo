@@ -2,13 +2,13 @@ use std::fmt::{Display, Formatter, Result};
 use vm::opcodes::Opcode;
 
 /// The `Instruction` type.
-#[derive(Clone)]
+#[derive(Clone, RustcEncodable, RustcDecodable, PartialEq, Debug)]
 pub struct Instruction {
     /// The position relative to the line.
-    pub pos: i32,
+    pub pos: u32,
 
     /// The line.
-    pub line: i32,
+    pub line: u32,
 
     /// The value of the instruction.
     pub value: String,
@@ -18,13 +18,17 @@ pub struct Instruction {
 
     /// The (optional) argument.
     pub argument: Option<u32>,
+
+    /// A value indicating whether the instruction
+    /// was modified by one or more optimization passes.
+    pub optimized: bool,
 }
 
 /// The `Instruction` implementation.
 impl Instruction {
     /// Constructs a new `Instruction.`
-    pub fn new(pos: i32,
-               line: i32,
+    pub fn new(pos: u32,
+               line: u32,
                value: String,
                opcode: Opcode,
                arg: Option<u32>)
@@ -37,6 +41,7 @@ impl Instruction {
             value: value,
             opcode: opcode,
             argument: arg,
+            optimized: false,
         }
     }
 

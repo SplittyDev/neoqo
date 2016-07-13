@@ -87,7 +87,7 @@ impl Lexer {
             let chr = self.peek(1);
 
             // Remember the current line and position for later use
-            let state = (self.current_pos.get(), self.current_line.get());
+            let state = (self.current_pos.get() as u32, self.current_line.get() as u32);
 
             // Test if the operator is a single-character operator
             // and is contained in the `operators` string.
@@ -178,7 +178,7 @@ impl Lexer {
     ///
     /// The state parameter expects a tuple contaning the position relative to the current line
     /// and the current line, in that order.
-    fn create_instruction(&mut self, state: (i32, i32), value: String, opcode: Opcode) {
+    fn create_instruction(&mut self, state: (u32, u32), value: String, opcode: Opcode) {
         let lex = Instruction::new(state.0, state.1, value, opcode, None);
         self.tokens.push(lex);
     }

@@ -14,12 +14,15 @@ fn main() {
         .author("Splitty <splittdev@gmail.com>")
         .arg(Arg::with_name("input")
             .help("The input file.")
-            .required(false)
+            .required(true)
             .index(1))
-        .arg(Arg::with_name("i")
+        .arg(Arg::with_name("interpret")
             .short("i")
             .long("interpret")
             .takes_value(true))
+        .arg(Arg::with_name("debug")
+            .long("debug")
+            .takes_value(false))
         .get_matches();
 
     // Retrieve the input code from the specified source
@@ -38,11 +41,7 @@ fn main() {
         }
 
         // No filename was specified
-        None => {
-            source.push_str(matches.value_of("i")
-                .unwrap_or("\"Please specifiy an input file!\"(;.);"));
-            println!("Source: {}", source);
-        }
+        _ => {}
     }
 
     // Tokenize the source
@@ -74,5 +73,8 @@ fn main() {
 
     // Interpret the instructions
     let mut vm = VirtualMachine::new(optimizer.instructions, Option::None, Option::None);
-    vm.run();
+    match matches.occurrences_of("debug") {
+        0 => vm.run(),
+        _ => vm.run_with_debugger(),
+    }
 }

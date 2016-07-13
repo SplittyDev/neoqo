@@ -4,6 +4,7 @@ use std::char;
 use std::io::{self, Read, Write};
 use vm::instruction::Instruction;
 use vm::opcodes::Opcode;
+use debugger::{DebugServer, DebugInformation};
 
 /// The `PrintMode` type.
 enum PrintMode {
@@ -39,6 +40,12 @@ pub struct VirtualMachine {
 
     /// The print mode. See `PrintMode` for details.
     print_mode: PrintMode,
+
+    /// The debug server.
+    debug_server: Option<DebugServer>,
+
+    /// A value indicating whether a debugger is attached.
+    debugger_attached: bool,
 }
 
 /// The `VirtualMachine` implementation.
@@ -58,6 +65,8 @@ impl VirtualMachine {
             ip: 0usize,
             cp: 0usize,
             ticks: 0u64,
+            debug_server: None,
+            debugger_attached: false,
             instructions: instructions,
             jump_table: BTreeMap::new(),
             print_mode: PrintMode::Char,
@@ -80,6 +89,28 @@ impl VirtualMachine {
             // Execute the next instruction
             self.run_cycle();
         }
+    }
+
+    /// Interprets the loaded instructions and
+    /// runs a debugging server.
+    ///
+    /// Use the `neodbg` executable to connect to the debugger.
+    pub fn run_with_debugger(&mut self) {
+
+        // Create and bind the debug server
+        let mut server = DebugServer::new();
+        print!("Waiting for debugger... ");
+        io::stdout().flush().ok().unwrap();
+        let connected = server.bind_and_accept();
+        self.debug_server = Some(server);
+        self.debugger_attached = connected;
+        match connected {
+            true => println!("Connected!"),
+            false => println!("Failed!"),
+        };
+
+        // Run normally
+        self.run();
     }
 
     /// Builds the jump table.
@@ -130,7 +161,19 @@ impl VirtualMachine {
 
     /// Executes a single instruction.
     fn run_cycle(&mut self) {
+
+        // Fetch the instruction
         let instr = &self.instructions[self.ip];
+
+        // Test if a debugger is attached
+        if self.debugger_attached && self.debug_server.is_some() {
+            let mut server = self.debug_server.as_mut().unwrap();
+            if !server.update(DebugInformation { instr: instr.clone() }) {
+                println!("***\nWARN: Debugger disconnected!\n***");
+                self.debugger_attached = false;
+            }
+        }
+
         match instr.opcode {
 
             // Increment the cell pointer

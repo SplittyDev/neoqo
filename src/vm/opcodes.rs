@@ -1,5 +1,5 @@
 /// The `Opcode` type.
-#[derive(Copy, Clone, PartialEq, Eq)]
+#[derive(Copy, Clone, RustcEncodable, RustcDecodable, PartialEq, Eq, Debug)]
 pub enum Opcode {
     // Basic opcodes
     Inc, // +

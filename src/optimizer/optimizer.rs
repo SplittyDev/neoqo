@@ -102,6 +102,7 @@ impl Optimizer {
                         .push(Instruction {
                             value: OPTIMIZED_VALUE.to_string(),
                             opcode: Opcode::Clear,
+                            optimized: true,
                             ..instr[0].clone()
                         });
                     state.skip(3);
@@ -142,6 +143,7 @@ impl Optimizer {
                     true => incs - decs,
                     false => decs - incs,
                 }),
+                optimized: true,
                 ..fst
             });
             return true;
@@ -178,6 +180,7 @@ impl Optimizer {
                     true => incs - decs,
                     false => decs - incs,
                 }),
+                optimized: true,
                 ..fst
             });
             return true;
