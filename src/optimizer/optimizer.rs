@@ -95,9 +95,9 @@ impl Optimizer {
         let three = state.peek(self, 3);
         match three {
             Some(instr) => {
-                if (instr[0].is(Opcode::JzStack) || instr[0].is(Opcode::JzCell)) &&
+                if instr[0].is(Opcode::JzCell) &&
                    instr[1].is(Opcode::Dec) &&
-                   (instr[2].is(Opcode::JnzStack) || instr[2].is(Opcode::JnzCell)) {
+                   instr[2].is(Opcode::JnzCell) {
                     self.out_instructions
                         .push(Instruction {
                             value: OPTIMIZED_VALUE.to_string(),
