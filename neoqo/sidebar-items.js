@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["OptimizerPass","The `OptimizerPass` type."]],"struct":[["DebugInformation","The `DebugInformation` type."],["Lexer","The `Lexer` type."],["Optimizer","The `Optimizer` type."],["VirtualMachine","The `VirtualMachine` type."]],"type":[["DebugClient","The `DebugClient` type."],["DebugServer","The `DebugServer` type."]]});
