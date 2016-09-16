@@ -263,7 +263,9 @@ impl VirtualMachine {
                     self.stack.push(0);
                     let mut i = buf.len();
                     while i > 0 {
-                        self.stack.push(buf[i - 1] as u32);
+                        if buf[i - 1] != 0 {
+                            self.stack.push(buf[i - 1] as u32);
+                        }
                         i -= 1;
                     }
                 }
@@ -323,7 +325,8 @@ impl VirtualMachine {
                 if stack_length == 0 {
                     panic!(format!("Attempt to pop value off empty stack (at {})", instr));
                 }
-                let value = self.stack[stack_length - 1];
+                let value = self.stack.pop().unwrap();
+                self.stack.push(value);
                 self.stack.push(value);
             }
 
@@ -334,8 +337,8 @@ impl VirtualMachine {
                 if stack_length < 2 {
                     panic!(format!("Attempt to pop value off empty stack (at {})", instr));
                 }
-                let fst = self.stack[stack_length - 1];
-                let snd = self.stack[stack_length - 2];
+                let fst = self.stack.pop().unwrap();
+                let snd = self.stack.pop().unwrap();
                 self.stack.push(fst);
                 self.stack.push(snd);
             }
